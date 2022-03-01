@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Scanner;
 
 public class MovieCollection
@@ -147,6 +148,22 @@ public class MovieCollection
       listToSort.set(possibleIndex, temp);
     }
   }
+
+  private void sortCast(ArrayList<String> listToSort)
+  {
+    for (int j = 1; j < listToSort.size(); j++)
+    {
+      String temp = listToSort.get(j);
+
+      int possibleIndex = j;
+      while (possibleIndex > 0 && temp.compareTo(listToSort.get(possibleIndex - 1)) < 0)
+      {
+        listToSort.set(possibleIndex, listToSort.get(possibleIndex - 1));
+        possibleIndex--;
+      }
+      listToSort.set(possibleIndex, temp);
+    }
+  }
   
   private void displayMovieInfo(Movie movie)
   {
@@ -171,59 +188,44 @@ public class MovieCollection
     // prevent case sensitivity
     searchCast = searchCast.toLowerCase();
 
-    // arraylist to hold search results
-    ArrayList<Movie> results = new ArrayList<Movie>();
-
-    // search through ALL movies in collection
-    for (int i = 0; i < movies.size(); i++)
+    ArrayList<String> castList = new ArrayList<String>();
+    for (Movie movie : movies)
     {
-      String movieCast = movies.get(i).getCast();
-      movieCast = movieCast.toLowerCase();
-
-      if (movieCast.indexOf(searchCast) != -1)
+      String[] actorList = movie.getCast().split("\\|");
+      for (String cast : actorList)
       {
-        //add the Movie objest to the results list
-        results.add(movies.get(i));
+        String lowerCaseCast = cast.toLowerCase();
+        if (lowerCaseCast.indexOf(searchCast) != -1)
+        {
+          castList.add(cast);
+        }
       }
     }
+
+    for (int i = 0; i < castList.size(); i++)
+    {
+      for (int j = i + 1; j < castList.size(); j++)
+      {
+        if (castList.get(i).equals(castList.get(j)))
+        {
+          castList.remove(j);
+          j--;
+        }
+      }
+    }
+
+    sortCast(castList);
 
     // now, display them all to the user
-    int choiceNum = 0;
-    for (int i = 0; i < results.size(); i++)
+    for (int i = 0; i < castList.size(); i++)
     {
-      ArrayList<String> castMembers = new ArrayList<String>();
-      String cast = results.get(i).getCast();
-      String[] castList = cast.split("\\|");
-      boolean inList = false;
-      for (String castMember : castList)
-      {
-        for (String castM : castMembers)
-        {
-          if (castMember.equals(castMembers))
-          {
-            inList = true;
-          }
-        }
-        if (cast.indexOf(searchCast) != -1 && !inList)
-        {
-          castMembers.add(castMember);
-          choiceNum++;
-          System.out.println("" + choiceNum + ". " + castMember);
-        }
-      }
+      String castMember = castList.get(i);
 
       // this will print index 0 as choice 1 in the results list; better for user!
+      int choiceNum = i + 1;
+
+      System.out.println("" + choiceNum + ". " + castMember);
     }
-
-    System.out.println("Which movie would you like to learn more about?");
-    System.out.print("Enter number: ");
-
-    int choice = scanner.nextInt();
-    scanner.nextLine();
-
-    Movie selectedMovie = results.get(choice - 1);
-
-    displayMovieInfo(selectedMovie);
 
     System.out.println("\n ** Press Enter to Return to Main Menu **");
     scanner.nextLine();
