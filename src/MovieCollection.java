@@ -416,8 +416,27 @@ public class MovieCollection
   private void listHighestRated()
   {
     /* TASK 6: IMPLEMENT ME! */
+    ArrayList<Movie> tempMovies = new ArrayList<Movie>();
+    for(Movie movie : movies)
+    {
+      tempMovies.add(movie);
+    }
+
+    for (int i = 1; i < tempMovies.size(); i++)
+    {
+      Movie temp = tempMovies.get(i);
+      int possibleIndex = i;
+      while (possibleIndex > 0 && temp.getUserRating() > tempMovies.get(possibleIndex - 1).getUserRating())
+      {
+        tempMovies.set(i, tempMovies.get(possibleIndex - 1));
+        possibleIndex--;
+        i--;
+      }
+      tempMovies.set(possibleIndex, temp);
+    }
+
     ArrayList<Movie> top50 = new ArrayList<Movie>();
-    for (Movie movie : movies)
+    for (Movie movie : tempMovies)
     {
       if (top50.size() < 50)
       {
@@ -427,7 +446,7 @@ public class MovieCollection
 
     for (int i = 0; i < top50.size(); i++)
     {
-      for (int j = 0; j < movies.size(); j++)
+      for (int j = i + 1; j < movies.size(); j++)
       {
         if (movies.get(j).getUserRating() > top50.get(i).getUserRating())
         {
@@ -437,7 +456,6 @@ public class MovieCollection
       }
     }
 
-    sortResults(top50);
     for (int i = 0; i < top50.size(); i++)
     {
       String title = top50.get(i).getTitle();
@@ -464,6 +482,65 @@ public class MovieCollection
   private void listHighestRevenue()
   {
     /* TASK 6: IMPLEMENT ME! */
+    ArrayList<Movie> tempMovies = new ArrayList<Movie>();
+    for(Movie movie : movies)
+    {
+      tempMovies.add(movie);
+    }
+    for (int i = 1; i < tempMovies.size(); i++)
+    {
+      Movie temp = tempMovies.get(i);
+      int possibleIndex = i;
+      while (possibleIndex > 0 && temp.getRevenue() > tempMovies.get(possibleIndex - 1).getRevenue())
+      {
+        tempMovies.set(i, tempMovies.get(possibleIndex - 1));
+        possibleIndex--;
+      }
+      tempMovies.set(possibleIndex, temp);
+    }
+
+    ArrayList<Movie> top50 = new ArrayList<Movie>();
+    for (Movie movie : tempMovies)
+    {
+      if (top50.size() < 50)
+      {
+        top50.add(movie);
+      }
+    }
+
+    for (int i = 0; i < top50.size(); i++)
+    {
+      for (int j = i + 1; j < movies.size(); j++)
+      {
+        if (movies.get(j).getRevenue() > top50.get(i).getRevenue())
+        {
+          movies.add(i, movies.get(j));
+          movies.remove(50);
+        }
+      }
+    }
+
+    for (int i = 0; i < top50.size(); i++)
+    {
+      String title = top50.get(i).getTitle();
+
+      int choiceNum = i + 1;
+
+      System.out.println("" + choiceNum + ". " + title + ": " + top50.get(i).getRevenue());
+    }
+
+    System.out.println("Which movie would you like to learn more about?");
+    System.out.print("Enter number: ");
+
+    int choice = scanner.nextInt();
+    scanner.nextLine();
+
+    Movie selectedMovie = top50.get(choice - 1);
+
+    displayMovieInfo(selectedMovie);
+
+    System.out.println("\n ** Press Enter to Return to Main Menu **");
+    scanner.nextLine();
   }
 
   private void importMovieList(String fileName)
@@ -492,7 +569,7 @@ public class MovieCollection
         String overview = movieFromCSV[5];
         int runtime = Integer.parseInt(movieFromCSV[6]);
         String genres = movieFromCSV[7];
-        double userRating = Float.parseFloat(movieFromCSV[8]);
+        double userRating = Double.parseDouble(movieFromCSV[8]);
         int year = Integer.parseInt(movieFromCSV[9]);
         int revenue = Integer.parseInt(movieFromCSV[10]);
 
